@@ -1,2 +1,2 @@
-# Sliding_Observateur_for_UIO
- Estimation cyber-attack for Cooperative ACC Vehicle
+# Cyberattack Estimation in Intelligent Transportation System by Using an Adaptive High Order Sliding Mode Differentiator 
+ - The estimation and detection of cyber-attacks in Connected and Autonomous Vehicles (CAV) are paramount for enhancing security and advancing vehicle automation. This paper presents a solution for estimating cyber-attacks in Cooperative Adaptive Cruise Controllers (CACC) while following a preceding vehicle. Our proposed method utilizes the derivative of the output measurements to derive a new system that satisfies the observer matching condition (OMC). Then, a High Order Sliding Mode Observer (HOSMO) is used to estimate these derivatives and reconstruct the cyberattack signal. The stability analysis is performed by using the Lyapunov stability theory. Several test scenarios are investigated to demonstrate the effectiveness and validity of the proposed algorithm.
