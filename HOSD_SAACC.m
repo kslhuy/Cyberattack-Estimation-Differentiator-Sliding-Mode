@@ -5,7 +5,7 @@ clc
 %% Parameters
 Ts = 1/100;
 t = 0:Ts:20;
-pas = 1e-4;
+% pas = 1e-4;
 Nt = length(t);
 tau = 0.4;
 li_1 = 5;
