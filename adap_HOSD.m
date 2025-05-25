@@ -79,11 +79,18 @@ K22 = 2;
 v_10 = 30;
 v_20 = 30;
 
-%% Adaptive parameters
-lambda_min = 0.1;  % Minimum to ensure positivity
-lambda_max = 100;  % Maximum to prevent excessive growth
-z_max = 10;        % Bound for integral terms
-dead_zone = 1e-3;  % Dead zone for robustness
+%% Improved parameters
+alpha = 0.2;       % Adaptation gain to slow updates
+M = 10;            % Cap for update terms
+dead_zone = 0.01;  % Increased deadzone
+K11 = 5;           % Increased differentiator gains
+K12 = 5;
+K13 = 5;
+K21 = 5;
+K22 = 5;
+lambda_min = 0.2;
+lambda_max = 100;   % Tightened bound
+z_max = 10;
 
 %% Initialize adaptive parameters
 lambda11 = zeros(1,Nt);
@@ -97,16 +104,15 @@ lambda22 = zeros(1,Nt);
 lambda23 = zeros(1,Nt);
 z23 = zeros(1,Nt);
 
-% Initial values
-lambda11(1) = 10;
-lambda12(1) = 10;
-lambda13(1) = 10;
-lambda14(1) = 10;
+%% Adaptive parameters initialization
+lambda11(1) = 7;
+lambda12(1) = 7;
+lambda13(1) = 7;
+lambda14(1) = 7;
 z14(1) = 0;
-
-lambda21(1) = 10;
-lambda22(1) = 10;
-lambda23(1) = 10;
+lambda21(1) = 7;
+lambda22(1) = 7;
+lambda23(1) = 7;
 z23(1) = 0;
 
 f_c_hat_new(1) = 0;
@@ -193,31 +199,32 @@ for i=1:Nt-1
     s21 = deadzone(w20(i), dead_zone);
     s22 = deadzone(w21(i), dead_zone);
 
-    %% Lambda update laws with bounds
+    %% Modified adaptation function (using quadratic term instead of power law)
+    update11 = s11^2 * sign(s11);  % Quadratic adaptation
+    update12 = s12^2 * sign(s12);
+    update13 = s13^2 * sign(s13);
+    update21 = s21^2 * sign(s21);
+    update22 = s22^2 * sign(s22);
+
+    %% Capped updates
+    update11 = min(abs(update11), M) * sign(update11);
+    update12 = min(abs(update12), M) * sign(update12);
+    update13 = min(abs(update13), M) * sign(update13);
+    update21 = min(abs(update21), M) * sign(update21);
+    update22 = min(abs(update22), M) * sign(update22);
+
+    %% Lambda updates
     if i < Nt-1
-        % First output
-        lambda11_update = lambda11(i) + Ts * abs(s11)^(7/4) * sat(s11,d);
-        lambda12_update = lambda12(i) + Ts * abs(s12)^(5/3) * sat(s12,d);
-        lambda13_update = lambda13(i) + Ts * abs(s13)^(3/2) * sat(s13,d);
-        z14_update = z14(i) + Ts * sign(s13);
-        lambda14_update = lambda14(i) + Ts * z14(i) * s13;
+        lambda11(i+1) = min(max(lambda11(i) + alpha * Ts * update11, lambda_min), lambda_max);
+        lambda12(i+1) = min(max(lambda12(i) + alpha * Ts * update12, lambda_min), lambda_max);
+        lambda13(i+1) = min(max(lambda13(i) + alpha * Ts * update13, lambda_min), lambda_max);
+        z14(i+1) = min(max(z14(i) + Ts * sign(s13), -z_max), z_max);
+        lambda14(i+1) = min(max(lambda14(i) + alpha * Ts * z14(i) * s13, lambda_min), lambda_max);
 
-        lambda11(i+1) = min(max(lambda11_update, lambda_min), lambda_max);
-        lambda12(i+1) = min(max(lambda12_update, lambda_min), lambda_max);
-        lambda13(i+1) = min(max(lambda13_update, lambda_min), lambda_max);
-        z14(i+1) = min(max(z14_update, -z_max), z_max);
-        lambda14(i+1) = min(max(lambda14_update, lambda_min), lambda_max);
-
-        % Second output
-        lambda21_update = lambda21(i) + Ts * abs(s21)^(5/3) * sat(s21,d);
-        lambda22_update = lambda22(i) + Ts * abs(s22)^(3/2) * sat(s22,d);
-        z23_update = z23(i) + Ts * sign(s22);
-        lambda23_update = lambda23(i) + Ts * z23(i) * s22;
-
-        lambda21(i+1) = min(max(lambda21_update, lambda_min), lambda_max);
-        lambda22(i+1) = min(max(lambda22_update, lambda_min), lambda_max);
-        z23(i+1) = min(max(z23_update, -z_max), z_max);
-        lambda23(i+1) = min(max(lambda23_update, lambda_min), lambda_max);
+        lambda21(i+1) = min(max(lambda21(i) + alpha * Ts * update21, lambda_min), lambda_max);
+        lambda22(i+1) = min(max(lambda22(i) + alpha * Ts * update22, lambda_min), lambda_max);
+        z23(i+1) = min(max(z23(i) + Ts * sign(s22), -z_max), z_max);
+        lambda23(i+1) = min(max(lambda23(i) + alpha * Ts * z23(i) * s22, lambda_min), lambda_max);
     end
 
     %% Reconstruction of unknown input (unchanged)
