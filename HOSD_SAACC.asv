@@ -84,28 +84,28 @@ ya_h(:,1) = [ya11_h(1) ya12_h(1) ya13_h(1) ya14_h(1) ya21_h(1) ya22_h(1) ya23_h(
 % Unknown input initial guess
 nu_h(1) = -3;
 
-K11 = 5;
-K12 = 5;
-K13 = 5;
+K11 = 3;
+K12 = 3;
+K13 = 3;
 
 
-K21 = 5;
-K22 = 5;
+K21 = 4;
+K22 = 4;
 
 
 v_10 = 30;
 v_20 = 30;
 t01 = 0;
 
-lambda11(1) = 7;
-lambda12(1) = 8;
-lambda13(1) = 16;
-lambda14(1) = 19;
+lambda11(1) = 10;
+lambda12(1) = 10;
+lambda13(1) = 10;
+lambda14(1) = 90;
 
 
-lambda21(1) = 8;
-lambda22(1) = 8;
-lambda23(1) = 8;
+lambda21(1) = 10;
+lambda22(1) = 30;
+lambda23(1) = 100;
 
 f_c_hat_new(1) = 0;
 
@@ -205,7 +205,7 @@ for i=1:Nt-1
     dya14_h(i) = -w14(i);
     ya14_h(i+1) = ya14_h(i)+dya14_h(i)*(t(i+1)-t(i));
     
-    %% Second Output (N'est pas nécessaire)
+    %% Second Output (N'est pas nÃ©cessaire)
     
     w20(i) = ya21_h(i)-y2(i);
     w21(i) = lambda21(i)*abs(w20(i))^((gamma2)/(gamma2+1))*sat(w20(i),d);
@@ -331,17 +331,17 @@ plot(t(2:end),nu,'Color',rgb1,'LineWidth',3);grid on
 hold on;
 % ouput one
 plot(t, nu_h ,'Color',rgb2,'LineWidth',3);
-% % ouput 2
-% plot(t, nu_h2 ,'LineWidth',3);
-% 
-% moyen = (nu_h2 +  nu_h)/2;
-% plot(t,moyen ,'LineWidth',3);
+% ouput 2
+plot(t, nu_h2 ,'LineWidth',3);
+
+moyen = (nu_h2 +  nu_h)/2;
+plot(t,moyen ,'LineWidth',3);
 
 
 grid on
 xlabel('{Time} ${[sec]}$','Interpreter','LaTeX','Fontsize',12);
 ylabel('$$f_{c}$$','Interpreter','LaTeX','Fontsize',12);
-ylim([-30 30 ]);
+ylim([-90 30 ]);
 % d4 = legend('$$f_{c}$$' , '$\hat{f}_c1$','${\hat{f}_{c2}}$','$$f_{moy}$$');
 d4 = legend('$$f_{c}$$' , '$\hat{f}_c1$','${\hat{f}_{c2}}$','$$f_{moy}$$');
 
@@ -360,6 +360,6 @@ box(ax,'on')
 plot(t,nu_h,'Color',rgb1,'LineWidth',1.5);grid on
 hold on;
 plot(t,[nu nu_h(end)] ,'Color',rgb2,'LineWidth',1.5);grid on
-set(ax,'xlim',[0,2],'ylim',[-90,20])
+set(ax,'xlim',[0,2],'ylim',[-85,20])
 
 

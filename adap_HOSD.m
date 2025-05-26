@@ -70,19 +70,11 @@ x_hat(:,1) = x_f0';
 ya_h(:,1) = [ya11_h(1) ya12_h(1) ya13_h(1) ya14_h(1) ya21_h(1) ya22_h(1) ya23_h(1)];
 nu_h(1) = -3;
 
-K11 = 0.8;
-K12 = 0.9;
-K13 = 0.99;
-K21 = 1;
-K22 = 2;
-
-v_10 = 30;
-v_20 = 30;
 
 %% Improved parameters
 alpha = 0.2;       % Adaptation gain to slow updates
 M = 10;            % Cap for update terms
-dead_zone = 0.01;  % Increased deadzone
+dead_zone = 0.02;  % Increased deadzone
 K11 = 5;           % Increased differentiator gains
 K12 = 5;
 K13 = 5;
@@ -92,6 +84,7 @@ lambda_min = 0.2;
 lambda_max = 100;   % Tightened bound
 z_max = 10;
 
+Nt_1 = Nt - 1;
 %% Initialize adaptive parameters
 lambda11 = zeros(1,Nt);
 lambda12 = zeros(1,Nt);
@@ -105,14 +98,15 @@ lambda23 = zeros(1,Nt);
 z23 = zeros(1,Nt);
 
 %% Adaptive parameters initialization
-lambda11(1) = 7;
-lambda12(1) = 7;
-lambda13(1) = 7;
-lambda14(1) = 7;
+lambda11(1) = 50;
+lambda12(1) = 50;
+lambda13(1) = 50;
+lambda14(1) = 50;
+
+lambda21(1) = 50;
+lambda22(1) = 50;
+lambda23(1) = 50;
 z14(1) = 0;
-lambda21(1) = 7;
-lambda22(1) = 7;
-lambda23(1) = 7;
 z23(1) = 0;
 
 f_c_hat_new(1) = 0;
@@ -136,6 +130,9 @@ for i=1:Nt-1
     else
         nu(i) = 0;
     end
+
+    % nu(i) = 0;
+
     mu(i) = ai_1(i)+nu(i);
     usyn(i) = (h*k1*k2)*mu(i) - k2*xf(2,i) - (k1+h*k1*k2)*ya13_h(i)...
         +1/h*(1-h*k1*k2)*ya12_h(i) + k2/h*ya11_h(i)...
@@ -149,6 +146,7 @@ for i=1:Nt-1
     y(:,i) = C*x(:,i);
     y1(i) = y(1,i);
     y2(i) = y(2,i);
+    
 
     %% Sliding mode differentiator
     g1(i) = c1*A*A*(B*xf(2,i)+F*mu(i)+Delt);
@@ -157,7 +155,7 @@ for i=1:Nt-1
     gamma1 = 3;
     gamma2 = 2;
     % d = 1e-5;
-    d = 1e-4;
+    d = 1e-3;
     %% First output
     w10(i) = ya11_h(i)-y1(i);
     w11(i) = lambda11(i)*abs(w10(i))^((gamma1)/(gamma1+1))*sat(w10(i),d);
@@ -214,7 +212,7 @@ for i=1:Nt-1
     update22 = min(abs(update22), M) * sign(update22);
 
     %% Lambda updates
-    if i < Nt-1
+    if i < Nt
         lambda11(i+1) = min(max(lambda11(i) + alpha * Ts * update11, lambda_min), lambda_max);
         lambda12(i+1) = min(max(lambda12(i) + alpha * Ts * update12, lambda_min), lambda_max);
         lambda13(i+1) = min(max(lambda13(i) + alpha * Ts * update13, lambda_min), lambda_max);

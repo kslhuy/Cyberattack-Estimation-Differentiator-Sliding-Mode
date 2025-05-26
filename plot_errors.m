@@ -55,24 +55,27 @@ figure(2)
 set(gcf,'color','w');
 rgb1 = [0.4660 0.6740 0.1880];
 rgb2 = [0 0.4470 0.7410];
+% true
 plot(t(2:end),nu,'Color',rgb1,'LineWidth',3);grid on
 hold on;
+% ouput one
 plot(t, nu_h ,'Color',rgb2,'LineWidth',3);
-
-% hold on ; 
-% plot(t(2:end), f_c_hat(:,1) ,'r','LineWidth',1.5);
-% plot(t(2:end), f_c_hat(:,2) ,'b','LineWidth',1.5);
+% % ouput 2
+plot(t, nu_h2 ,'LineWidth',3);
 % 
-% plot(t, f_c_hat_new ,'g','LineWidth',1.5);
-
-% plot(t(2:end), f_c_hat_new - f_c_hat(:,1)  ,'y','LineWidth',1.5);
+moyen = (nu_h2 +  nu_h)/2;
+plot(t,moyen ,'LineWidth',3);
 
 
 grid on
 xlabel('{Time} ${[sec]}$','Interpreter','LaTeX','Fontsize',12);
 ylabel('$$f_{c}$$','Interpreter','LaTeX','Fontsize',12);
-ylim([-90 30 ]);
-d4 = legend('${\hat{f}_c}$','$$f_{c}$$');
+ylim([-30 30 ]);
+d4 = legend('$$f_{c}$$' , '$\hat{f}_c1$','${\hat{f}_{c2}}$','$$f_{moy}$$');
+% d4 = legend('$$f_{c}$$' , '$\hat{f}_c1$','${\hat{f}_{c2}}$','$$f_{moy}$$');
+
+
+
 d4.Interpreter = "latex";
 d4.FontSize = 18;
 d14 = title('Cyber-attack and its estimation');
